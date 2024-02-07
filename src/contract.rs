@@ -1,5 +1,5 @@
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
-use crate::{msg::UserInfo, state::USER_REQUEST};
+use crate::{msg::UserInfo, state::{EMP_REQUESTS, USER_REQUEST}};
 
 
 //Instantiate will be used to set new requests to In Progress
@@ -8,8 +8,11 @@ pub fn instantiate(
     deps: DepsMut,
     request_id: String, 
     user_info: UserInfo,
+    company_name: String,
+    emp_requests: Vec<String>,
 ) -> StdResult<Response> {
     USER_REQUEST.save(deps.storage, request_id, &user_info)?;
+    EMP_REQUESTS.save(deps.storage, company_name, &emp_requests)?;//Stores all the request IDs that a certain company gets
     Ok(Response::new())
 }
 

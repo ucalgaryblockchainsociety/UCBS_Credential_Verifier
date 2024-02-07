@@ -16,6 +16,8 @@ pub struct UserInfo{
 pub struct InstantiateMsg {
     pub request_id: String,
     pub user_info: UserInfo,
+    pub company_name: String,
+    pub emp_requests: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

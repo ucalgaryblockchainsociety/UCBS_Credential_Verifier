@@ -15,7 +15,7 @@ pub fn instantiate(
     _info: MessageInfo,
     msg: InstantiateMsg,
 ) -> StdResult<Response>{
-    contract::instantiate(deps, msg.request_id,msg.user_info)
+    contract::instantiate(deps, msg.request_id,msg.user_info, msg.company_name, msg.emp_requests)
 }
 
 #[entry_point]
@@ -75,15 +75,16 @@ mod test{
                 "Request contract",
                 None,
             ).unwrap();
-        app.execute_contract(sender, contract_addr.clone(),&ExecuteMsgs::NewRequest { req_id: "2".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() }, &[]).unwrap();
+        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsgs::NewRequest { req_id: "2".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() }, &[]).unwrap();
+        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsgs::UpdateRequest { req_id: "2".to_string(), req_status: "in progress".to_string() },  &[]).unwrap();
 
         let resp: QueryResp = app
             .wrap()
-            .query_wasm_smart(contract_addr, &QueryMsgs::Request { request_id: "1".to_string() })
+            .query_wasm_smart(contract_addr, &QueryMsgs::Request { request_id: "2".to_string() })
             .unwrap();
         
             let userdata = UserInfo{
-                request_id: "2".to_string(),
+                request_id: "1".to_string(),
                 employee_id: "444".to_string(),
                 company: "atco".to_string(),
                 department: "projects".to_string(),
