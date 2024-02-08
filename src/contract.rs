@@ -31,7 +31,7 @@ pub mod query{
 
 pub mod exec{
     use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
-    use crate::{msg::UserInfo, state::USER_REQUEST};
+    use crate::{error::ContractError, msg::UserInfo, state::{OWNER, USER_REQUEST}};
 
 
     pub fn newrequest(deps: DepsMut, info:MessageInfo, request_id: String, employee_id:String,company:String, department:String, supervisor:String, req_status:String) ->StdResult<Response>{
@@ -53,8 +53,11 @@ pub mod exec{
         Ok(resp)
     }
 
-    pub fn updaterequest(deps: DepsMut, info:MessageInfo, req_id: String, req_status:String) ->StdResult<Response>{
-
+    pub fn updaterequest(deps: DepsMut, info:MessageInfo, req_id: String, req_status:String) ->Result<Response, ContractError>{
+        let owner = OWNER.load(deps.storage)?;
+        if info.sender != owner{
+            return Err(ContractError::Unauthorized{});
+        }
         let mut ureq = USER_REQUEST.load(deps.storage, req_id.clone()).unwrap();
         
         ureq.req_status = req_status;

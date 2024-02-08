@@ -6,7 +6,8 @@ pub mod state;
 
 use contract::query;
 use cosmwasm_std::{entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
-use msg::{ExecuteMsgs, InstantiateMsg, QueryMsgs};
+use error::ContractError;
+use msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 #[entry_point]
 pub fn instantiate(
@@ -19,8 +20,8 @@ pub fn instantiate(
 }
 
 #[entry_point]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsgs) -> StdResult<Binary>{
-    use crate::QueryMsgs::Request;
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary>{
+    use crate::QueryMsg::Request;
     match msg{
         Request{request_id} => to_json_binary(&query::getUser(deps, request_id)?),
     }
@@ -29,10 +30,10 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsgs) -> StdResult<Binary>{
 
 
 #[entry_point]
-pub fn execute(deps:DepsMut, env: Env, info:MessageInfo, msg:ExecuteMsgs) ->StdResult<Response>{
+pub fn execute(deps:DepsMut, env: Env, info:MessageInfo, msg:ExecuteMsg) ->Result<Response, ContractError>{
 
     use contract::exec;
-    use msg::ExecuteMsgs::*;
+    use msg::ExecuteMsg::*;
 
     match msg{
         NewRequest{ 
@@ -42,7 +43,7 @@ pub fn execute(deps:DepsMut, env: Env, info:MessageInfo, msg:ExecuteMsgs) ->StdR
             department,
             supervisor,
             req_status
-        } => exec::newrequest(deps, info, req_id, employee_id,company, department, supervisor, req_status),
+        } => exec::newrequest(deps, info, req_id, employee_id,company, department, supervisor, req_status).map_err(ContractError::Std),
         UpdateRequest{ req_id, req_status} => exec::updaterequest(deps, info, req_id, req_status),
     }
 }
@@ -52,7 +53,7 @@ pub fn execute(deps:DepsMut, env: Env, info:MessageInfo, msg:ExecuteMsgs) ->StdR
 mod test{
     use std::default;
 
-    use crate::msg::{QueryMsgs, QueryResp, UserInfo};
+    use crate::msg::{QueryMsg, QueryResp, UserInfo};
 
     use super::*;
     use cosmwasm_std::{Addr, Empty};
@@ -70,17 +71,19 @@ mod test{
             .instantiate_contract(
                 contract_id,
                 sender.clone(),
-                &InstantiateMsg{request_id: "1".to_string(), user_info: UserInfo { request_id: "1".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() }},
+                &InstantiateMsg{request_id: "1".to_string(), user_info: UserInfo { request_id: "1".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() },
+                                        company_name: "first".to_string(),
+                                        emp_requests: vec!["first".to_string()],},
                 &[],
                 "Request contract",
                 None,
             ).unwrap();
-        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsgs::NewRequest { req_id: "2".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() }, &[]).unwrap();
-        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsgs::UpdateRequest { req_id: "2".to_string(), req_status: "in progress".to_string() },  &[]).unwrap();
+        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsg::NewRequest { req_id: "2".to_string(), employee_id: "444".to_string(), company: "atco".to_string(), department: "projects".to_string(), supervisor: "brett".to_string(), req_status: "verified".to_string() }, &[]).unwrap();
+        app.execute_contract(sender.clone(), contract_addr.clone(),&ExecuteMsg::UpdateRequest { req_id: "2".to_string(), req_status: "in progress".to_string() },  &[]).unwrap();
 
         let resp: QueryResp = app
             .wrap()
-            .query_wasm_smart(contract_addr, &QueryMsgs::Request { request_id: "2".to_string() })
+            .query_wasm_smart(contract_addr, &QueryMsg::Request { request_id: "2".to_string() })
             .unwrap();
         
             let userdata = UserInfo{

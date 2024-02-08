@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
+use cosmwasm_schema::cw_serde;
+use cosmwasm_schema::QueryResponses;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[cw_serde]
 pub struct UserInfo{
     pub request_id: String,
     pub employee_id: String,
@@ -11,8 +12,7 @@ pub struct UserInfo{
 
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-#[serde(rename_all="snake_case")]
+#[cw_serde]
 pub struct InstantiateMsg {
     pub request_id: String,
     pub user_info: UserInfo,
@@ -20,9 +20,8 @@ pub struct InstantiateMsg {
     pub emp_requests: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-#[serde(rename_all="snake_case")]
-pub enum ExecuteMsgs {
+#[cw_serde]
+pub enum ExecuteMsg{
     NewRequest{
         req_id: String,
         employee_id: String,
@@ -37,14 +36,15 @@ pub enum ExecuteMsgs {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-#[serde(rename_all="snake_case")]
+#[cw_serde]
 pub struct QueryResp{
     pub value: UserInfo,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-#[serde(rename_all="snake_case")]
-pub enum QueryMsgs {
+#[cw_serde]
+#[derive(QueryResponses)]
+pub enum QueryMsg{
+
+    #[returns (QueryResp)]
     Request{request_id:String},
 }
