@@ -1,11 +1,11 @@
 use cosmwasm_schema::write_api;
 
-use cosm_wasm::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use cosm_wasm::msg::{RequestVerify, InstantiateCompanyMsg, QueryCompanyMsg};
 
 fn main() {
     write_api! {
-        instantiate: InstantiateMsg,
-        execute: ExecuteMsg,
-        query: QueryMsg,
+        instantiate: InstantiateCompanyMsg,
+        execute: RequestVerify,
+        query: QueryCompanyMsg,
     }
 }

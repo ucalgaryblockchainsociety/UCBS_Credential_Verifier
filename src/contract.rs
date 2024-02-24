@@ -3,9 +3,10 @@ use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 // use cw2::set_contract_version;
 
 use crate::error::ContractError;
-use crate::msg::{CompanyVerify, InstantiateCompanyMsg, QueryCompanyMsg,RequestVerify};
+use crate::msg::{InstantiateCompanyMsg, QueryCompanyMsg,RequestVerify};
 use crate::state::{CompanyConfig,COMPANYCONFIG};
-use crate::query::{query_company_config};
+use crate::query::{query_company_config,query_request,query_employee};
+use crate::execute::{receive_request,validate_request};
 
 /*
 // version info for migration info
@@ -39,16 +40,22 @@ pub fn execute(
     _info: MessageInfo,
     _msg: RequestVerify,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    match _msg {
+        RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
+        RequestVerify::Verify{} => validate_request(_deps, _env,_info.sender),
+    }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(_deps: Deps, _env: Env, _msg: QueryCompanyMsg) -> StdResult<Binary> {
     // unimplemented!()
     match _msg {
-        QueryCompanyMsg::CompanyConfig {} => to_json_binary(&query::query_company_config(_deps?)?),
-        QueryCompanyMsg::Request { address:String } => {
-            to_json_binary(&query_requests(deps, deps.api.addr_validate(&address)?)?)
+        QueryCompanyMsg::CompanyConfig {} => to_json_binary(&query_company_config(_deps)?),
+        QueryCompanyMsg::Request {request_id} => {
+            to_json_binary(&query_request(_deps, _deps.api.addr_validate(&request_id)?)?)
+        },
+        QueryCompanyMsg::Employees {employee_account} => {
+            to_json_binary(&query_employee(_deps, _deps.api.addr_validate(&employee_account)?)?)
         }
     }
 }
