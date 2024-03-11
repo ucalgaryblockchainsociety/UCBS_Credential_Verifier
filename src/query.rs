@@ -7,6 +7,7 @@ pub fn query_company_config(deps: Deps) -> StdResult<CompanyResponse> {
     let comp_config: CompanyConfig = COMPANYCONFIG.load(deps.storage)?;
 
     Ok(CompanyResponse{
+        company_id: comp_config.company_id.to_string(),
         company_name: comp_config.company_name.to_string(),
         tax_document: comp_config.tax_document,
     })

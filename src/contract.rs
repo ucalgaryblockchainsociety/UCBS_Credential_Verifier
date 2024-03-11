@@ -1,3 +1,4 @@
+use cosmwasm_std::StdError;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,entry_point,to_json_binary};
 // use cw2::set_contract_version;
@@ -51,11 +52,18 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryCompanyMsg) -> StdResult<Binary>
     // unimplemented!()
     match _msg {
         QueryCompanyMsg::CompanyConfig {} => to_json_binary(&query_company_config(_deps)?),
+        // EmployeeInfo
+        QueryCompanyMsg::Employees {employee_account} => {
+            match &query_employee(_deps, _deps.api.addr_validate(&employee_account)?) {
+                Ok(result) => to_json_binary(&result),
+                Err(_) => {
+                    to_json_binary(&query_request(_deps, _deps.api.addr_validate(&employee_account)?)?)
+                },
+            }
+        },
+        // {request_id} RequestInfo
         QueryCompanyMsg::Request {request_id} => {
             to_json_binary(&query_request(_deps, _deps.api.addr_validate(&request_id)?)?)
-        },
-        QueryCompanyMsg::Employees {employee_account} => {
-            to_json_binary(&query_employee(_deps, _deps.api.addr_validate(&employee_account)?)?)
         }
     }
 }
