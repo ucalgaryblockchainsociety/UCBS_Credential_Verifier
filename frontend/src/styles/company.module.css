@@ -1,0 +1,50 @@
+.companyPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 100vh;
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .companyPage h1 {
+    color: #007BFF;
+    margin-bottom: 24px;
+    font-size: 2em;
+    text-align: center;
+  }
+  
+  .verifyBtn, .fileInput {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px 0;
+    padding: 12px 24px;
+    font-size: 1em;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .verifyBtn {
+    background-color: #007BFF;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.4);
+  }
+  
+  .verifyBtn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.6);
+  }
+  
+  .fileInput {
+    cursor: pointer;
+    background-color: #ffffff;
+    color: #007BFF;
+    border: 2px solid #007BFF;
+  }
+  
+  .fileInput:hover {
+    background-color: #f0f0f0;
+  }

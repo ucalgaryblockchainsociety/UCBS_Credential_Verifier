@@ -1,0 +1,50 @@
+.userPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  min-height: 100vh; /* Full height */
+  background-color: #ffffff; /* Original white background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.userPage h1 {
+  color: #007BFF; /* Blue, for contrast and to match the button color */
+  margin-bottom: 24px;
+  font-size: 2em;
+  text-align: center;
+}
+
+.verifyBtn, .fileInput {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 10px 0;
+  padding: 12px 24px;
+  font-size: 1em;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.verifyBtn {
+  background-color: #007BFF; /* Blue */
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.4);
+}
+
+.verifyBtn:hover {
+  background-color: #0056b3; /* Darker blue */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.6);
+}
+
+.fileInput {
+  cursor: pointer;
+  background-color: #ffffff; /* White */
+  color: #007BFF; /* Blue, to match the button color */
+  border: 2px solid #007BFF; /* Blue border */
+}
+
+.fileInput:hover {
+  background-color: #f0f0f0; /* Lighter grey */
+}
