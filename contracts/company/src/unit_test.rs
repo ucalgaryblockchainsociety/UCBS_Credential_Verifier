@@ -1,8 +1,9 @@
 use crate::contract::{instantiate,execute,query};
 use crate::msg::{InstantiateCompanyMsg,RequestVerify,QueryCompanyMsg,CompanyResponse,RequestResponse,EmployeeResponse};
-use cosmwasm_std::{to_json_binary, from_json, MessageInfo, Empty, Addr};
+use cosmwasm_std::{to_json_binary, from_json, MessageInfo, Empty, Addr, Binary};
 use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+use cw721::Cw721ReceiveMsg;
 
 use std::fs;
 use std::fs::File;
@@ -71,7 +72,11 @@ fn poke_request() {
     app.execute_contract(
         info.sender.clone(),
         contract_addr.clone(),
-        &RequestVerify::Initiate {},
+        &RequestVerify::Receive(Cw721ReceiveMsg{ 
+            sender: "requestor".to_string(), 
+            token_id: "123456789".to_string(), 
+            msg: Binary::from("Some other info".as_bytes())
+        }),
         &[],
     )
     .unwrap();

@@ -1,6 +1,7 @@
-use cosmwasm_std::StdError;
+
 #[cfg(not(feature = "library"))]
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,entry_point,to_json_binary};
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, Addr, StdResult, entry_point,to_json_binary};
+use cw721::Cw721ReceiveMsg;
 // use cw2::set_contract_version;
 
 use crate::error::ContractError;
@@ -42,7 +43,12 @@ pub fn execute(
     _msg: RequestVerify,
 ) -> Result<Response, ContractError> {
     match _msg {
-        RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
+        RequestVerify::Receive(Cw721ReceiveMsg {
+            sender,
+            token_id: _,
+            msg: _,
+        }) => receive_request(_deps, _env, Addr::unchecked(sender)),
+        // RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
         RequestVerify::Verify{} => validate_request(_deps, _env,_info.sender),
     }
 }
