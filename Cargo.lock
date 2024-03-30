@@ -329,6 +329,7 @@ name = "controller"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "company",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-multi-test 0.16.5",

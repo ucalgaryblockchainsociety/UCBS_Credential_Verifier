@@ -49,6 +49,7 @@ serde = { version = "1.0.189", default-features = false, features = ["derive"] }
 thiserror = "1.0.49"
 cw-multi-test = {version = "0.16.2", optional= true}
 anyhow = {version = "1.0.70", optional= true}
+company = { version = "0.1.0", path = "../company", features = ["library"] }
 
 [dev-dependencies]
 cw-multi-test = "0.17.0"

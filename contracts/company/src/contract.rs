@@ -1,6 +1,6 @@
-
 #[cfg(not(feature = "library"))]
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, Addr, StdResult, entry_point,to_json_binary};
+use cosmwasm_std::entry_point;
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, Addr, StdResult,to_json_binary};
 use cw721::Cw721ReceiveMsg;
 // use cw2::set_contract_version;
 
