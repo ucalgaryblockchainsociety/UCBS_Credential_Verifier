@@ -1,7 +1,7 @@
 [package]
-name = "company"
+name = "user"
 version = "0.1.0"
-authors = ["Joey-mi <joanne.millard@ucalgary.ca>"]
+authors = ["Dyenaan Dapoet"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -20,6 +20,9 @@ codegen-units = 1
 panic = 'abort'
 incremental = false
 overflow-checks = true
+
+members = ["contracts/*"]
+resolver = "2"
 
 [features]
 # for more explicit tests, cargo test --features=backtraces
@@ -41,15 +44,11 @@ cosmwasm-std = { version = "1.5.0", features = [
     # Enable this if you only deploy to chains that have CosmWasm 1.4 or higher
     # "cosmwasm_1_4",
 ] }
-cosmwasm-check = "1.5.3"
 cw-storage-plus = "1.1.0"
 cw2 = "1.1.1"
 schemars = "0.8.15"
 serde = { version = "1.0.189", default-features = false, features = ["derive"] }
-image = "0.24.8"
-cw721 = "^0.18.0"
-cw721-base = "=0.18.0"
-thiserror = "^1.0.38"
+thiserror = "1.0.49"
 
 [dev-dependencies]
 cw-multi-test = "0.17.0"
