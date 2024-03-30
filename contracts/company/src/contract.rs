@@ -1,5 +1,7 @@
-use cosmwasm_std::StdError;
 #[cfg(not(feature = "library"))]
+use cosmwasm_std::entry_point;
+
+use cosmwasm_std::StdError;
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,entry_point,to_json_binary};
 // use cw2::set_contract_version;
 
