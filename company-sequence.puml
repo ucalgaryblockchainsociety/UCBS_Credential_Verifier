@@ -1,0 +1,53 @@
+@startuml
+title Company Sequence Diagram
+
+actor User as U
+
+box "Cosmos Blockchain"
+  participant "Account Contract" as AC
+  participant "Token Contract" as TC
+  participant "Remote Employee Contract" as REC
+end box
+
+
+autonumber
+
+group Query History 
+
+U --> AC: query account state
+activate AC
+
+AC --> U: Response
+deactivate AC
+
+end group
+
+group Account Verify
+
+  U --> TC: send_info(identifying info, timelock)
+
+
+  TC --> AC: receive_acceptance(account_id, accept_bool, timelock)
+  activate AC
+
+  AC --> AC: create account history
+
+  AC --> U: registration(accept_bool)
+  deactivate AC
+
+end group
+
+group Verify Employee
+
+  REC --> AC: verify_emplyoment(employee id, other info, user)
+  activate AC
+
+  AC --> AC: add employee to account history
+  AC --> REC: send(employee id,verification, user)
+
+  AC --> U: notify(verification, user)
+  deactivate AC
+
+
+end group
+@enduml

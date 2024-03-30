@@ -1,4 +1,5 @@
 use cosmwasm_schema::QueryResponses;
+use cw721::Cw721ReceiveMsg;
 use serde::{Deserialize, Serialize};
 use schemars::JsonSchema;
 
@@ -45,10 +46,11 @@ pub enum QueryCompanyMsg {
     // MsgEmployee(EmployeeInfo),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RequestVerify {
-    Initiate{},
+    Receive(Cw721ReceiveMsg),
+    // Initiate{},
     Verify{}
     // Store the soulbound nft here?
 }
