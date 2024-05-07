@@ -72,11 +72,13 @@ fn poke_request() {
     app.execute_contract(
         info.sender.clone(),
         contract_addr.clone(),
-        &RequestVerify::Receive(Cw721ReceiveMsg{ 
-            sender: "requestor".to_string(), 
-            token_id: "123456789".to_string(), 
-            msg: Binary::from("Some other info".as_bytes())
-        }),
+        // Uncommented when CW721 is implemenetdxs
+        // &RequestVerify::Receive(Cw721ReceiveMsg{ 
+        //     sender: "requestor".to_string(), 
+        //     token_id: "123456789".to_string(), 
+        //     msg: Binary::from("Some other info".as_bytes())
+        // }),
+        &RequestVerify::Initiate {},
         &[],
     )
     .unwrap();

@@ -43,12 +43,13 @@ pub fn execute(
     _msg: RequestVerify,
 ) -> Result<Response, ContractError> {
     match _msg {
-        RequestVerify::Receive(Cw721ReceiveMsg {
-            sender,
-            token_id: _,
-            msg: _,
-        }) => receive_request(_deps, _env, Addr::unchecked(sender)),
-        // RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
+        // Save for when cW721 is implemented
+        // RequestVerify::Receive(Cw721ReceiveMsg {
+        //     sender,
+        //     token_id: _,
+        //     msg: _,
+        // }) => receive_request(_deps, _env, Addr::unchecked(sender)),
+        RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
         RequestVerify::Verify{} => validate_request(_deps, _env,_info.sender),
     }
 }

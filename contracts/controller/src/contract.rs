@@ -12,7 +12,7 @@ mod reply;
 //Instantiate will be used to set new requests to In Progress
 pub fn instantiate(
     deps: DepsMut,
-    env: Env,
+    _env: Env,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
 

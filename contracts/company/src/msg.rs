@@ -49,8 +49,9 @@ pub enum QueryCompanyMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RequestVerify {
-    Receive(Cw721ReceiveMsg),
-    // Initiate{},
+    // uncommented when CW721 is implemented
+    // Receive(Cw721ReceiveMsg),
+    Initiate{},
     Verify{}
     // Store the soulbound nft here?
 }
