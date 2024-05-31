@@ -4,6 +4,9 @@ pub mod helpers;
 pub mod msg;
 pub mod state;
 
+#[cfg(any(feature = "mt", test))]
+pub mod multitest;
+
 // use contract::query;
 use cosmwasm_std::{entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 use error::ContractError;
@@ -13,9 +16,10 @@ use msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 pub fn instantiate(
     deps:DepsMut,
     env:Env,
+    _info:MessageInfo,
     msg: InstantiateMsg,
 ) -> StdResult<Response>{
-    contract::instantiate(deps,env,msg)
+    contract::instantiate(deps,env,_info,msg)
 }
 
 
@@ -32,9 +36,11 @@ pub fn reply(deps:DepsMut, env:Env, reply:Reply) -> Result<Response, ContractErr
 
 // #[entry_point]
 // pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary>{
-//     use crate::QueryMsg::{UserRequest,EmpRequests};
+//     // use crate::QueryMsg::{UserRequest,EmpRequests};
+//     use crate::QueryMsg::UserRequests;
+//     use crate::QueryMsg::UserInfo;
 //     match msg{
-//         UserRequests{user_id} => to_json_binary(&query::get_user_requests(deps, request_id)?)
+//         UserRequests{request_id} => to_json_binary(&query::get_user_requests(deps, request_id)?),
 //         UserInfo{} => to_json_binary(&query::get_user_info(deps)?)
 //     }
 // }

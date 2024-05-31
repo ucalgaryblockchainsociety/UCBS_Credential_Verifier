@@ -11,4 +11,16 @@ pub enum ContractError {
 
     #[error("Unrecognized reply id: {0}")]
     UnrecognizedReplyID(u64),
+
+    #[error("User request with this id is not found")]
+    NoExistingRequest {},
+
+    #[error("User not found")]
+    NoExistingUser {},
+}
+
+impl From<ContractError> for StdError {
+    fn from(err: ContractError) -> StdError {
+        StdError::generic_err(err.to_string())
+    }
 }

@@ -9,6 +9,7 @@ mod reply;
 pub fn instantiate(
     deps: DepsMut,
     env: Env,
+    _info:MessageInfo,
     msg: InstantiateMsg,
 ) -> StdResult<Response> {
 
@@ -56,18 +57,47 @@ pub fn reply(deps: DepsMut,env:Env,reply: Reply) -> Result<Response, ContractErr
 }
 
 pub mod query{
-    use cosmwasm_std::{Deps, StdResult};
+    use cosmwasm_std::{Deps, StdResult, StdError, Env, MessageInfo, Binary, to_json_binary};
 
-    use crate::{msg::{UserInfoQueryResp, UserReqQueryResp}, state::{USER_INFO, USER_REQUEST}};
+    use crate::{error::ContractError, msg::{UserInfoQueryResp, UserReqQueryResp}, state::{USER_INFO, USER_REQUEST}};
 
 
-    pub fn get_user_requests(deps: Deps, req_id: String) -> StdResult<UserReqQueryResp>{
-        let value = USER_REQUEST.load(deps.storage, req_id)?;
-        Ok(UserReqQueryResp{value})
+    pub fn get_user_requests(deps: Deps, _env: Env, req_id: String) -> StdResult<Binary> {//StdResult<UserReqQueryResp>{
+        // let value = USER_REQUEST.load(deps.storage, req_id)?;
+        let value = USER_REQUEST.may_load(deps.storage, req_id)?;
+
+        match value {
+            Some(value) => {
+                // let value = value.unwrap();
+                let result = UserReqQueryResp{value};
+                to_json_binary(&result)
+            },
+            None => {
+                // StdError::
+                // let no_existing_req_id = req_id.copy();
+                Err(ContractError::NoExistingRequest{}.into())
+            }
+        }
+        // Ok(UserReqQueryResp{value})
+        // Ok(to_json_binary(&UserReqQueryResp{value}));
     }
 
-    pub fn get_user_info(deps: Deps) -> StdResult<UserInfoQueryResp>{
-        let value = USER_INFO.load(deps.storage)?;
-        Ok(UserInfoQueryResp{value})
+    pub fn get_user_info(deps: Deps, _env: Env) -> StdResult<Binary> {// StdResult<UserInfoQueryResp>{
+        // let value = USER_INFO.load(deps.storage)?;
+        let value = USER_INFO.may_load(deps.storage)?;
+
+        match value {
+            Some(value) => {
+                // let value = value.unwrap();
+                let result = UserInfoQueryResp{value};
+                to_json_binary(&result)
+            },
+            None => {
+                // StdError::
+                Err(ContractError::NoExistingUser{}.into())
+            }
+        }
+
+        // Ok(UserInfoQueryResp{value});
     }
 }

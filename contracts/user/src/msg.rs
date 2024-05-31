@@ -84,7 +84,7 @@ pub struct UserInfoQueryResp{
 pub enum QueryMsg{
 
     #[returns (UserReqQueryResp)]
-    UserRequests{request_id:String},
+    UserRequests{request_id: String},
 
     #[returns (UserInfoQueryResp)]
     UserInfo{},
