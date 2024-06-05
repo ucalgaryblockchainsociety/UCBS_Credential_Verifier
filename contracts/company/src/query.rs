@@ -2,6 +2,7 @@ use cosmwasm_std::{Addr, Deps, StdError, StdResult};
 
 use crate::msg::{CompanyResponse, RequestResponse,EmployeeResponse};
 use crate::state::{CompanyConfig,COMPANYCONFIG,REQUESTS,EMPLOYEES};
+use controller::msg::{UpdateRequest,UserRequest};
 
 pub fn query_company_config(deps: Deps) -> StdResult<CompanyResponse> {
     let comp_config: CompanyConfig = COMPANYCONFIG.load(deps.storage)?;
@@ -13,8 +14,9 @@ pub fn query_company_config(deps: Deps) -> StdResult<CompanyResponse> {
     })
 }
 
-pub fn query_request(deps: Deps, request: Addr) -> StdResult<RequestResponse> {
-    let request = REQUESTS.may_load(deps.storage, &request)?;
+pub fn query_request(deps: Deps, request: String) -> StdResult<RequestResponse> {
+
+    let request = REQUESTS.may_load(deps.storage, request)?;
 
     if request.is_none() {
         return Err(StdError::generic_err("No request found"));
@@ -23,15 +25,12 @@ pub fn query_request(deps: Deps, request: Addr) -> StdResult<RequestResponse> {
     let request = request.unwrap();
 
     Ok(RequestResponse {
-        user_id: request.user_id.to_string(),
-        req_status: request.req_status,
-        verdict: request.verdict,
-        time: request.time
+        req_info: request,
     })
 }
 
-pub fn query_employee(deps: Deps, employee: Addr) -> StdResult<EmployeeResponse> {
-    let employee = EMPLOYEES.may_load(deps.storage, &employee)?;
+pub fn query_employee(deps: Deps, employee: String) -> StdResult<EmployeeResponse> {
+    let employee = EMPLOYEES.may_load(deps.storage, employee)?;
 
     if employee.is_none() {
         return Err(StdError::generic_err("Employee Not Found"));
@@ -40,8 +39,6 @@ pub fn query_employee(deps: Deps, employee: Addr) -> StdResult<EmployeeResponse>
     let employee = employee.unwrap();
 
     Ok(EmployeeResponse {
-        employee_account: employee.employee_account.to_string(),
-        user_info: employee.user_info,
-        time: employee.time
+        employee_info: employee,
     })
 }

@@ -3,7 +3,8 @@ use std::time;
 use cosmwasm_schema::cw_serde;
 use cw_storage_plus::{Map, Item};
 use cosmwasm_std::Addr;
-use crate::msg::{UserInfo, UserRequest};
+use crate::msg::UserInfo;
+use controller::msg::UserRequest;
 
 #[cw_serde]
 pub struct Config{

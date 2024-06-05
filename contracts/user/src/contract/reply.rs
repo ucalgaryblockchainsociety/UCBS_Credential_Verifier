@@ -10,7 +10,7 @@ pub fn new_request(deps: DepsMut, env: Env) -> Result<Response, ContractError>{
 
     let mut user_request = USER_REQUEST.load(deps.storage, update_id.clone())?;
 
-    user_request.req_status = "pending".to_string();
+    user_request.req_status = Some("pending".to_string());
 
     USER_REQUEST.save(deps.storage, update_id.clone(), &user_request)?;
 

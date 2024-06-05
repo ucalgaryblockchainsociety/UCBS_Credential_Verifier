@@ -2,33 +2,46 @@ use cw_storage_plus::{Item, Map};
 use cosmwasm_std:: Addr ;
 use serde::{Deserialize, Serialize};
 
-pub const COMPANYCONFIG: Item<CompanyConfig> = Item::new("config");
-pub const REQUESTS: Map<&Addr, Request> = Map::new("request");
-pub const EMPLOYEES: Map<&Addr, Employees> = Map::new("employee");
+use crate::msg::{EmployeeInfo};
+use controller::msg::{UserRequest};
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CompanyConfig {
-    pub company_id: Addr,
+    pub company_id: String,
     pub company_name: String,
     pub tax_document: Vec<u8>,
-    // pub all_requests: &'a mut Vec<Request>,
-    // pub all_employees: &'a mut Vec<Employees>
+    pub controller_contract: Addr,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Request {
-    pub user_id: Addr,
-    pub req_status: bool,
-    pub verdict: bool,
-    pub time: u64
-}
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Employees {
-    pub employee_account: Addr,
-    pub user_info: String,
-    pub time: u64
-    // soulbound token?
-}
+
+pub const COMPANYCONFIG: Item<CompanyConfig> = Item::new("config");
+pub const REQUESTS: Map<String, UserRequest> = Map::new("request"); //request_id, Request Info
+pub const EMPLOYEES: Map<String, EmployeeInfo> = Map::new("employee"); // employee_id, emolyee_info
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // #[cfg_attr(not(feature = "library"), entry_point)]
+
+// #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+// pub struct CompanyConfig {
+//     pub company_id: Addr,
+//     pub company_name: String,
+//     pub tax_document: Vec<u8>,
+//     // pub all_requests: &'a mut Vec<Request>,
+//     // pub all_employees: &'a mut Vec<Employees>
+// }

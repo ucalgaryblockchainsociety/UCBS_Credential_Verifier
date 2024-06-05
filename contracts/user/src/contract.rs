@@ -1,5 +1,7 @@
 use cosmwasm_std::{ensure, to_json_binary, DepsMut, Env, MessageInfo, Reply, Response, StdResult, WasmMsg};
-use crate::{error::ContractError, msg::{ControllerExecMsg, ExecuteMsg, InstantiateMsg, UserInfo, UserRequest}, state::{Config, CONFIG, OWNER, USER_INFO, USER_REQUEST}};
+use crate::{error::ContractError, msg::{ControllerExecMsg, ExecuteMsg, InstantiateMsg, UserInfo}, state::{Config, CONFIG, OWNER, USER_INFO, USER_REQUEST}};
+use controller::msg::UserRequest;
+
 
 const NEW_REQ_REPLY_ID: u64 = 1;
 mod exec;

@@ -1,6 +1,8 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Addr;
+use is_empty::IsEmpty;
+use controller::msg::{UpdateRequest,UserRequest};
 
 #[cw_serde]
 pub struct UserInfo{
@@ -8,25 +10,6 @@ pub struct UserInfo{
     pub user_name: String,
     pub user_address: String,
 }
-
-#[cw_serde]
-pub struct UserRequest{
-    pub user_id: String,
-    pub request_id: String,
-    pub employee_id: String,
-    pub company: String,
-    pub department: String,
-    pub supervisor: String,
-    pub req_status: String,
-}
-
-#[cw_serde]
-pub struct UpdateRequest{
-    pub user_id: String,
-    pub request_id: String,
-    pub req_status: String,
-}
-
 
 #[cw_serde]
 pub struct InstantiateMsg {

@@ -13,7 +13,7 @@ pub fn usernewrequest(deps: DepsMut, info:MessageInfo, env: Env, user_request: U
 
     let company_id = user_request.company.clone();
 
-    let company_info = COMPANIES.load(deps.storage, company_id)?;
+    let company_info = COMPANIES.load(deps.storage, company_id.unwrap())?;
 
     let company_contract_id = company_info.contract_id;
     
@@ -29,7 +29,7 @@ pub fn usernewrequest(deps: DepsMut, info:MessageInfo, env: Env, user_request: U
     let resp = Response::new()
         .add_submessage(company_newreq_msg)
         .add_attribute("action", "newrequest")
-        .add_attribute("Sender", user_request.user_id.clone());
+        .add_attribute("Sender", user_request.user_id.clone().unwrap());
 
     Ok(resp)
 
@@ -46,8 +46,7 @@ pub fn companyupdaterequest(deps: DepsMut,info:MessageInfo, update_request: Upda
     
     let owner = OWNER.load(deps.storage)?;
     ensure!(owner == info.sender, ContractError::Unauthorized);
-    
-    let user_info = EMPLOYEES.load(deps.storage, update_request.user_id.clone())?;
+    let user_info = EMPLOYEES.load(deps.storage, update_request.user_id.clone().unwrap())?;
 
     let user_contract_id = user_info.contract_id;
 

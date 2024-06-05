@@ -1,52 +1,71 @@
-use cosmwasm_std::{Addr, DepsMut, Env, Response};
+use cosmwasm_std::{to_json_binary, Addr, DepsMut, Env, MessageInfo, Response, WasmMsg};
+use is_empty::IsEmpty;
 
 use crate::error::ContractError;
-use crate::state::{Request,REQUESTS,Employees,EMPLOYEES};
+use crate::msg::{EmployeeInfo};
+use crate::state::{CompanyConfig, COMPANYCONFIG, EMPLOYEES, REQUESTS};
+use controller::msg::{ExecuteMsg as ControllerExecMsg, UserRequest, UpdateRequest};
 
-// Receive request from controller
-pub fn receive_request(deps: DepsMut, env: Env, user: Addr) -> Result<Response, ContractError> {
-    // let comp_config: CompanyConfig = COMPANYCONFIG.load(deps.storage)?; 
 
-    let request = REQUESTS.may_load(deps.storage, &user)?;
+// // Receive request from controller
+// pub fn receive_request(deps: DepsMut, env: Env, user: String) -> Result<Response, ContractError> {
     
-    if request.is_some() {
-        let request = request.unwrap();
+//     let request = REQUESTS.may_load(deps.storage, user)?;
+    
+//     if request.is_some() {
+//         let request = request.unwrap();
 
-        if !request.req_status {
-            return Err(ContractError::ExistingRequest {});
-        }
-    }
+//         if request.req_status.is_none() {
+//             return Err(ContractError::ExistingRequest {});
+//         }
+//     }
+   
 
-    let request: Request = Request {
-        user_id: user.clone(),
-        req_status: false,
-        verdict: false,
-        time: env.block.time.seconds(),
-    };
+//     REQUESTS.save(deps.storage, &user, &request)?;
 
-    REQUESTS.save(deps.storage, &user, &request)?;
-
-    Ok(Response::default().add_attribute("action", "request"))
-}
+//     Ok(Response::default().add_attribute("action", "request"))
+// }
 
 // This will be fully once I figure out the NFT
-pub fn validate_request(deps: DepsMut, env: Env, user: Addr) -> Result<Response, ContractError> {
-    // let comp_config: CompanyConfig = COMPANYCONFIG.load(deps.storage)?;
+pub fn process_request(deps: DepsMut, env: Env, info: MessageInfo, req_id: String, verdict: bool, req_status: String) -> Result<Response, ContractError> {
+    
+    let config: CompanyConfig = COMPANYCONFIG.load(deps.storage)?;
 
-    let request = REQUESTS.may_load(deps.storage, &user)?;
-    if request.is_none() {
+    let request = REQUESTS.may_load(deps.storage, req_id.clone())?.unwrap();
+    if request.is_empty() {
         return Err(ContractError::NoExistingRequest {});
     }
-
-    REQUESTS.remove(deps.storage, &user);
-
-    let employee: Employees = Employees {
-        employee_account: user.clone(),
-        user_info: "".to_string(),
-        time: env.block.time.seconds(),
+    let update_req = UpdateRequest{
+        user_id: request.user_id.clone(),
+        request_id: Some(req_id.clone()),
+        verdict: Some(verdict),
+        req_status: Some(req_status)
     };
 
-    EMPLOYEES.save(deps.storage, &user, &employee)?;
+    let controller_msg = ControllerExecMsg::CompanyUpdateRequest{update_request:update_req};
+    let controller_msg = WasmMsg::Execute { 
+        contract_addr: config.controller_contract.to_string(),
+        msg: to_json_binary(&controller_msg)?,
+        funds: vec![], 
+    };
+    
+    let resp: Response = Response::new()
+        .add_message(controller_msg)
+        .add_attribute("action", "updaterequest")
+        .add_attribute("sender", info.sender.as_str()); 
+
+
+    let employee: EmployeeInfo = 
+    EmployeeInfo {
+        emp_id: request.employee_id.unwrap(),
+        emp_name: request.employee_name.unwrap(),
+    };
+
+    REQUESTS.remove(deps.storage, req_id);
+    if !verdict{
+        //Blacklist requestor
+    }
+    EMPLOYEES.save(deps.storage, employee.emp_id.clone(), &employee)?;
 
     Ok(Response::new()
         .add_attribute("action", "validate"))

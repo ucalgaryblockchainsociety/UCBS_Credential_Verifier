@@ -1,9 +1,9 @@
 use cosmwasm_std::{ensure, to_json_binary, DepsMut,Env, MessageInfo, Response, SubMsg, WasmMsg};
-use crate::{contract::NEW_REQ_REPLY_ID, error::ContractError, msg::{ControllerExecMsg, UpdateRequest, UserRequest}, state::{Config, CONFIG, OWNER, PENDING_REQUESTS, USER_REQUEST}};
+use crate::{contract::NEW_REQ_REPLY_ID, error::ContractError, msg::{ControllerExecMsg}, state::{Config, CONFIG, OWNER, PENDING_REQUESTS, USER_REQUEST}};
+use controller::msg::{UpdateRequest, UserRequest};
 
 
-
-pub fn newrequest(deps: DepsMut, _env:Env, info:MessageInfo, user_request: UserRequest) ->Result<Response, ContractError>{
+pub fn newrequest(deps: DepsMut, env:Env, info:MessageInfo, user_request: UserRequest) ->Result<Response, ContractError>{
         
         
     let owner = OWNER.load(deps.storage)?;
@@ -15,16 +15,19 @@ pub fn newrequest(deps: DepsMut, _env:Env, info:MessageInfo, user_request: UserR
         user_id: user_request.user_id,//user_contract_id
         request_id: user_request.request_id.clone(),
         employee_id: user_request.employee_id,
+        employee_name:user_request.employee_name,
         company: user_request.company,
+        verdict: user_request.verdict,
         department: user_request.department,
         supervisor: user_request.supervisor,
         req_status: user_request.req_status,
+        time: Some(env.block.time.seconds()),
     };
 
-    USER_REQUEST.save(deps.storage, userdata.request_id.clone(), &userdata)?;//update the list of requests for the particultar user, using maybe .update function
+    USER_REQUEST.save(deps.storage, userdata.request_id.clone().unwrap(), &userdata)?;//update the list of requests for the particultar user, using maybe .update function
     
     let mut pending_reqs = PENDING_REQUESTS.load(deps.storage)?;
-    pending_reqs.push(user_request.request_id.clone());
+    pending_reqs.push(user_request.request_id.clone().unwrap());
     PENDING_REQUESTS.save(deps.storage, &pending_reqs)?;
 
 
@@ -51,19 +54,22 @@ pub fn updaterequest(deps: DepsMut, env:Env, info:MessageInfo, update_request: U
     let owner = OWNER.load(deps.storage)?;
     ensure!(owner == info.sender, ContractError::Unauthorized);
 
-    let init_request = USER_REQUEST.load(deps.storage, update_request.request_id.clone())?;
+    let init_request = USER_REQUEST.load(deps.storage, update_request.request_id.clone().unwrap())?;
 
     let updated_request = UserRequest{
         user_id: init_request.user_id,
         request_id: init_request.request_id,
         employee_id: init_request.employee_id,
+        employee_name:init_request.employee_name,
         company: init_request.company,
+        verdict:init_request.verdict,
         department: init_request.department,
         supervisor: init_request.supervisor,
         req_status: update_request.req_status,
+        time: Some(env.block.time.seconds()),
     };
 
-    USER_REQUEST.save(deps.storage, update_request.request_id.clone(), &updated_request)?;
+    USER_REQUEST.save(deps.storage, update_request.request_id.clone().unwrap(), &updated_request)?;
 
     let resp = Response::new()
         .add_attribute("action", "updaterequest");

@@ -1,9 +1,11 @@
 use crate::contract::{instantiate,execute,query};
-use crate::msg::{InstantiateCompanyMsg,RequestVerify,QueryCompanyMsg,CompanyResponse,RequestResponse,EmployeeResponse};
+use crate::msg::{CompanyResponse, EmployeeResponse, InstantiateCompanyMsg, QueryCompanyMsg, RequestResponse, RequestVerify};
 use cosmwasm_std::{to_json_binary, from_json, MessageInfo, Empty, Addr};
 use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+use controller::msg::UserRequest;
 
+use core::time;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
@@ -19,12 +21,15 @@ fn test_company_instantiation() {
     // let metadata = fs::metadata(&filename).expect("unable to read metadata");
     // let mut buffer = vec![0; metadata.len() as usize];
     // f.read(&mut buffer).expect("buffer overflow");
+
     let len = 10;
     let buffer = vec![0; len];
 
     let msg = InstantiateCompanyMsg {
+        company_id: "1".to_string(),
         company_name: "Test_Company".to_string(),
         tax_document: buffer.clone(),
+        controller_contract: "empty for now".to_string()//create codeID in controller contract and call here
     };
     let info = mock_info("some_id", &[]);
     instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
@@ -36,7 +41,7 @@ fn test_company_instantiation() {
     assert_eq!(
         actual_config,
         CompanyResponse {
-            company_id: info.sender.to_string(),
+            company_id: "1".to_string(),
             company_name: "Test_Company".to_string(),
             tax_document: cloned_buf,
         }
@@ -51,22 +56,23 @@ fn poke_request() {
 
     let buffer = vec![1, 2, 3, 4, 5];
     let tax_document = buffer.clone();
+    let company_id = "1".to_string();
     let company_name = "Test Company".to_string();
-
+    let controller_contract = "testcodeId".to_string();
 
     let contract_addr = app
     .instantiate_contract(
         contract_id,
         Addr::unchecked("sender"),
-        &InstantiateCompanyMsg { company_name, tax_document},
+        &InstantiateCompanyMsg { company_id, company_name, tax_document, controller_contract},
         &[],
-        "Counting contract",
+        "Company contract",
         None,
     )
     .unwrap();
 
     let info = mock_info("requestor", &[]);
-    let request_id = info.sender.to_string().clone();
+    let request_id = "req1".to_string();
 
     app.execute_contract(
         info.sender.clone(),
@@ -82,10 +88,20 @@ fn poke_request() {
         .unwrap();
  
     assert_eq!(resp, RequestResponse { 
-        user_id: info.sender.to_string().clone(),
-        req_status: false,
-        verdict: false,
-        time: mock_env().block.time.seconds()
+        req_info: {
+            UserRequest{
+            user_id: Some("firstUser".to_string()),
+            request_id:Some("req1".to_string()), 
+            employee_id:Some("emp1".to_string()),
+            employee_name:Some("dyenaan".to_string()),
+            company: Some("Test Company".to_string()), 
+            verdict: Some(false),
+            department:Some("Dev".to_string()),
+            supervisor:Some("miself".to_string()),
+            req_status:Some("in progress".to_string()), // new, complete, cancelled
+            time: Some(mock_env().block.time.seconds()),
+        }
+    }
     });
 }
 
@@ -94,6 +110,7 @@ fn company_contract() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(execute, instantiate, query);
     Box::new(contract)
 }
+
 // #[test]
 // fn query_values(){
 //     let mut app = App::defualt();

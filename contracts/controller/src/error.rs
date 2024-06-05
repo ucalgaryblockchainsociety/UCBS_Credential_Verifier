@@ -10,4 +10,7 @@ pub enum ContractError {
     Unauthorized,
     #[error("Unrecognized reply id: {0}")]
     UnrecognizedReplyID(u64),
+
+    #[error("Empty request")]
+    EmptyRequest,
 }
