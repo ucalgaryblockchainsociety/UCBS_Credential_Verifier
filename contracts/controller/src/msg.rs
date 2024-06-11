@@ -11,7 +11,15 @@ pub struct UserInfo{
     pub department: String,
     pub supervisor: String,
     pub req_status: String,
-    pub contract_id: Addr,
+    pub contract_id: u64,
+}
+
+#[cw_serde]
+pub struct CompInfo{
+    pub company_id: String,
+    pub company_name: String,
+    pub contract_id: u64,
+    pub status: String, //Whether the company has been verified or not. Can be in progress, failed or verified
 }
 
 #[cw_serde]
@@ -28,7 +36,9 @@ pub struct UserRequest{
     pub req_status: Option<String>, // new, complete, cancelled
     pub time: Option<u64>
 }
+
 #[cw_serde]
+#[derive(Eq,IsEmpty)]
 pub struct UpdateRequest{
     pub user_id: Option<String>,
     pub request_id: Option<String>,
@@ -37,22 +47,11 @@ pub struct UpdateRequest{
 }
 
 
-
-#[cw_serde]
-pub struct CompInfo{
-    pub company_id: String,
-    pub company_name: String,
-    pub contract_id: Addr,
-    pub status: String, //Whether the company has been verified or not. Can be in progress, failed or verified
-}
-
 #[cw_serde]
 pub struct InstantiateMsg {
     pub owner:String,
-    pub company_contract: Addr,
-    pub emp_contract: Addr,
     pub user_info: UserInfo,
-    pub company_info: CompInfo,
+    pub company_info: CompInfo
 }
 
 #[cw_serde]
@@ -67,23 +66,6 @@ pub enum ExecuteMsg{
     
 }
 
-#[cw_serde]
-pub enum CompanyExecMsg{
-    NewRequest{
-        user_request: UserRequest,
-    },
-}
-
-#[cw_serde]
-pub enum UserExecMsg{
-
-    UpdateRequest { //Foreign message for executing on the User contract. Intended to send updates to verification requests from an employer to the user.
-        update_request: UpdateRequest,
-        //Depending on status, update user wallet with soulbound NFT, may need users wallet address
-    },
-
-}
-
 
 #[cw_serde]
 pub struct UserQueryResp{
@@ -91,20 +73,39 @@ pub struct UserQueryResp{
     pub value: UserInfo, //Query response for UserRequest should give the Users Information which is a struct called UserInfo
 
 }
+
 #[cw_serde]
 pub struct CompQueryResp{
 
-    pub companies: Vec<String>,//Query response for EmpRequests should give the list of all requests for to a specific company
+    pub companies: CompInfo,//Query response for EmpRequests should give the list of all requests for to a specific company
 
 }
+#[cw_serde]
+pub struct ReqQueryResp{
+
+    pub user_request: UserRequest,//Query response for EmpRequests should give the list of all requests for to a specific company
+
+}
+
+#[cw_serde]
+pub struct OwnerResp{
+    pub value: Addr, //Query response for UserRequest should give the Users Information which is a struct called UserInfo
+}
+
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg{
 
-    #[returns (UserQueryResp)]
-    UserRequest{request_id:String},
+    #[returns(OwnerResp)]
+    Owner{},
 
     #[returns (CompQueryResp)]
-    EmpRequests{company_name: String},
+    QueryCompany{company_id:String},
+
+    #[returns (UserQueryResp)]
+    QueryEmployee{employee_id: String},
+    
+    #[returns (ReqQueryResp)]
+    QueryRequest{request_id: String},
 }

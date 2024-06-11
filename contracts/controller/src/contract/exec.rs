@@ -1,7 +1,7 @@
 
 use cosmwasm_std::{ensure, to_json_binary, DepsMut, Env, MessageInfo, Response, SubMsg, WasmMsg};
 
-use crate::{contract::USER_UPDATE_REQ_REPLY_ID, error::ContractError, msg::{CompanyExecMsg, UpdateRequest, UserExecMsg, UserRequest}, state::{COMPANIES, EMPLOYEES, OWNER}};
+use crate::{contract::USER_UPDATE_REQ_REPLY_ID, error::ContractError, msg::{ExecuteMsg, UpdateRequest, UserRequest}, state::{COMPANIES, EMPLOYEES, OWNER}};
 
 use super::COMP_NEW_REQ_REPLY_ID;
 
@@ -17,7 +17,7 @@ pub fn usernewrequest(deps: DepsMut, info:MessageInfo, env: Env, user_request: U
 
     let company_contract_id = company_info.contract_id;
     
-    let company_newreq_msg = CompanyExecMsg::NewRequest{user_request: user_request.clone()};
+    let company_newreq_msg = ExecuteMsg::UserNewRequest{user_request: user_request.clone()};
     let company_newreq_msg = WasmMsg:: Execute{
         contract_addr: company_contract_id.to_string(),
         msg: to_json_binary(&company_newreq_msg)?,
@@ -50,7 +50,7 @@ pub fn companyupdaterequest(deps: DepsMut,info:MessageInfo, update_request: Upda
 
     let user_contract_id = user_info.contract_id;
 
-    let user_update_msg = UserExecMsg::UpdateRequest { update_request: update_request };
+    let user_update_msg = ExecuteMsg::CompanyUpdateRequest { update_request: update_request };
     let user_update_msg = WasmMsg::Execute { 
         contract_addr: user_contract_id.to_string(), 
         msg: to_json_binary(&user_update_msg)?,

@@ -1,3 +1,4 @@
+use controller::msg::UpdateRequest;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 
@@ -9,7 +10,9 @@ use crate::error::ContractError;
 use crate::msg::{InstantiateCompanyMsg, QueryCompanyMsg,RequestVerify};
 use crate::state::{CompanyConfig,COMPANYCONFIG};
 use crate::query::{query_company_config,query_request,query_employee};
-use crate::execute::{process_request};
+mod exec;
+mod reply;
+
 
 /*
 // version info for migration info
@@ -45,22 +48,20 @@ pub fn execute(
     _env: Env,
     _info: MessageInfo,
     _msg: RequestVerify,
-    req_id: String,
-    verdict: bool,
-    req_status: String,
 ) -> Result<Response, ContractError> {
+    
     match _msg {
         //RequestVerify::Initiate{} => receive_request(_deps, _env,  _info.sender),
-        RequestVerify::Verify{} => process_request(_deps, _env,_info,req_id,verdict,req_status),
+        RequestVerify::Verify{update_request} => exec::process_request(_deps, _env,_info,update_request),
     }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(_deps: Deps, _env: Env, _msg: QueryCompanyMsg) -> StdResult<Binary> {
     match _msg {
-        QueryCompanyMsg::CompanyConfig {} => to_json_binary(&query_company_config(_deps)?),
+        QueryCompanyMsg::CompanyConfigQuery{} => to_json_binary(&query_company_config(_deps)?),
         // EmployeeInfo
-        QueryCompanyMsg::Employee {employee_account} => {
+        QueryCompanyMsg::EmployeeQuery {employee_account} => {
             match &query_employee(_deps, employee_account.clone()) {
 
                 Ok(result) => to_json_binary(&result),
@@ -70,7 +71,7 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryCompanyMsg) -> StdResult<Binary>
             }
         },
         // {request_id} RequestInfo
-        QueryCompanyMsg::Request {request_id} => {
+        QueryCompanyMsg::RequestQuery {request_id} => {
             to_json_binary(&query_request(_deps, request_id)?)
         }
     }

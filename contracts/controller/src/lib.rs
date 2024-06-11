@@ -5,6 +5,8 @@ pub mod state;
 
 #[cfg(any(feature = "mt", test))]
 pub mod multitest;
+pub mod query;
+
 
 // use contract::query;
 use cosmwasm_std::{entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
@@ -15,9 +17,10 @@ use msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 pub fn instantiate(
     deps:DepsMut,
     env:Env,
+    _info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError>{
-    contract::instantiate(deps, env, msg)
+    contract::instantiate(deps, env, _info, msg)
 }
 
 // #[entry_point]
@@ -34,6 +37,13 @@ pub fn execute(deps:DepsMut, env: Env, info:MessageInfo, msg:ExecuteMsg) ->Resul
 
     contract::execute(deps, env, info, msg)
 }
+
+#[entry_point]
+pub fn query(deps:Deps, env: Env,msg:QueryMsg) ->StdResult<Binary>{
+
+    contract::query(deps, env, msg)
+}
+
 
 #[entry_point]
 pub fn reply(deps:DepsMut, env:Env, reply:Reply) -> Result<Response, ContractError>{

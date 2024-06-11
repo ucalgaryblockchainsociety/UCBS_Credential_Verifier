@@ -21,17 +21,14 @@ pub struct InstantiateCompanyMsg {
     pub controller_contract: String,
 }
 
-//Foreign Messages
-#[cw_serde]
-pub enum ControlleExecMsg{
-    ProcessRequest{req_id: String},
-}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RequestVerify {
     // Initiate{},
-    Verify{}
+    Verify{
+        update_request: UpdateRequest,
+    }
     // Store the soulbound nft here?
 }
 
@@ -40,11 +37,11 @@ pub enum RequestVerify {
 #[serde(rename_all = "snake_case")]
 pub enum QueryCompanyMsg {
     #[returns(CompanyResponse)]
-    CompanyConfig{},
+    CompanyConfigQuery{},
     #[returns(RequestResponse)]
-    Request{request_id: String},
+    RequestQuery{request_id: String},
     #[returns(EmployeeResponse)]
-    Employee{employee_account: String}
+    EmployeeQuery{employee_account: String}
     
     // MsgCompany(CompanyInfo),
     // MsgRequest(RequestInfo),
