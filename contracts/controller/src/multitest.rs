@@ -6,6 +6,7 @@
 use cosmwasm_std::{Addr, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 use crate::{error::ContractError, msg::{CompInfo, ExecuteMsg, InstantiateMsg, UserInfo}, state::{Config, COMPANIES, CONFIG, EMPLOYEES, OWNER}};
 
+
 // use crate::contract::{execute, instantiate, query, reply};
 // use crate::msg::{CompInfo, ExecMsg, InstantiateMsg, QueryMsg, UserInfo};
 

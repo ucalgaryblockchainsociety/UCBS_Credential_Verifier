@@ -1,11 +1,13 @@
 use anyhow::Result as AnyResult;
-use cosmwasm_std::{from_binary, Addr, Coin, coin,  Decimal};
+use cosmwasm_std::{Addr, coin};
 use cw_multi_test::{App, ContractWrapper, Executor};
-use cw_utils::parse_execute_response_data;
+// use cw_utils::parse_execute_response_data;
 
 use crate::contract::{execute, instantiate, query, reply};
 use crate::msg::{ExecuteMsg, InstantiateMsg, UserRequest, UpdateRequest, UserInfo}; // ProposeMemberData
 
+#[cfg(test)]
+mod tests;
 
 #[derive(Clone, Copy, Debug)]
 pub struct CodeIdUserInfo(u64);
@@ -27,12 +29,12 @@ impl CodeIdUserInfo {
         app: &mut App,
         sender: &str,
         owner: &str,
-        user_info: &UserInfo,
-        user_requests: &UserRequest,
+        user_info: UserInfo,
+        user_requests: UserRequest,
         controller_contract: &str,
         is_valid: bool,
-    ) -> AnyResult<Contract> {
-        Contract::instantiate(
+    ) -> AnyResult<Contractwithinfo> {
+        Contractwithinfo::instantiate(
             app,
             self,
             sender,
@@ -60,12 +62,12 @@ impl CodeIdUserRequest {
         app: &mut App,
         sender: &str,
         owner: &str,
-        user_info: &UserInfo,
-        user_requests: &UserRequest,
+        user_info: UserInfo,
+        user_requests: UserRequest,
         controller_contract: &str,
         is_valid: bool,
-    ) -> AnyResult<Contract> {
-        Contract::instantiate(
+    ) -> AnyResult<Contractwithrequest> {
+        Contractwithrequest::instantiate(
             app,
             self,
             sender,
@@ -91,9 +93,12 @@ impl From<CodeIdUserRequest> for u64 {
 }
 
 #[derive(Debug)]
-pub struct Contract(Addr);
+pub struct Contractwithrequest(Addr);
 
-impl Contract {
+#[derive(Debug)]
+pub struct Contractwithinfo(Addr);
+
+impl Contractwithrequest {
     pub fn from_addr(addr: Addr) -> Self {
         Self(addr)
     }
@@ -106,7 +111,77 @@ impl Contract {
     #[track_caller]
     pub fn instantiate(
         app: &mut App,
-        code_id: CodeId,
+        code_id: CodeIdUserRequest,
+        sender: &str,
+        owner: &str,
+        user_info: UserInfo,
+        user_requests: UserRequest,
+        controller_contract: &str,
+        is_valid: bool,
+        
+    ) -> AnyResult<Self> {
+        let msg = InstantiateMsg {
+            owner: owner.to_owned(),
+            user_info,
+            user_requests,
+            controller_contract: controller_contract.to_owned(),
+            is_valid,
+        };
+
+        app.instantiate_contract(
+            code_id.0, 
+            Addr::unchecked(sender), 
+            &msg, 
+            &[], 
+            "Contract", // label
+            None)
+            .map(Self)
+    }
+
+    #[track_caller]
+    // pub fn new_request(&self, app: &mut App, sender: &str, user_request: impl Into<&UserRequest>) -> AnyResult<()> {
+    pub fn new_request<'a, T: Into<UserRequest>>(&self, app: &mut App, sender: &str, user_request: T) -> AnyResult<()> {
+        let user_request: UserRequest = user_request.into();
+
+        let msg = ExecuteMsg::NewRequest{user_request};
+
+        let tokens = vec![
+            coin(123, "utest")
+        ];
+
+        app.execute_contract(Addr::unchecked(sender), self.0.clone(), &msg, &tokens)?;
+        Ok(())
+    }
+    #[track_caller]
+    pub fn update_request<'a, T: Into<UpdateRequest>>(&self, app: &mut App, sender: &str, update_request: T) -> AnyResult<()> {
+        let update_request: UpdateRequest = update_request.into();
+
+        let msg = ExecuteMsg::UpdateRequest{update_request};
+
+        let tokens = vec![
+            coin(123, "utest")
+        ];
+
+        app.execute_contract(Addr::unchecked(sender), self.0.clone(), &msg, &tokens)?;
+        Ok(())
+    }
+
+}
+
+impl Contractwithinfo {
+    pub fn from_addr(addr: Addr) -> Self {
+        Self(addr)
+    }
+
+    pub fn addr(&self) -> &Addr {
+        &self.0
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    #[track_caller]
+    pub fn instantiate(
+        app: &mut App,
+        code_id: CodeIdUserInfo,
         sender: &str,
         owner: &str,
         user_info: UserInfo,

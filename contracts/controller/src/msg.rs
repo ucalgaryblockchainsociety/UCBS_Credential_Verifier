@@ -1,5 +1,4 @@
-use cosmwasm_schema::cw_serde;
-use cosmwasm_schema::QueryResponses;
+use cosmwasm_schema::{QueryResponses,cw_serde};
 use cosmwasm_std::Addr;
 
 #[cw_serde]
@@ -77,6 +76,16 @@ pub enum UserExecMsg{
 
 }
 
+#[cw_serde]
+#[derive(Eq,QueryResponses)]
+pub enum QueryMsg{
+
+    #[returns(UserQueryResp)]
+    UserRequest{request_id:String},
+
+    #[returns(CompQueryResp)]
+    EmpRequests{company_name: String},
+}
 
 #[cw_serde]
 pub struct UserQueryResp{
@@ -87,17 +96,7 @@ pub struct UserQueryResp{
 #[cw_serde]
 pub struct CompQueryResp{
 
-    pub companies: Vec<String>,//Query response for EmpRequests should give the list of all requests for to a specific company
+    pub companies: Vec<String>, //Query response for EmpRequests should give the list of all requests for to a specific company
 
 }
 
-#[cw_serde]
-#[derive(QueryResponses)]
-pub enum QueryMsg{
-
-    #[returns (UserQueryResp)]
-    UserRequest{request_id:String},
-
-    #[returns (CompQueryResp)]
-    EmpRequests{company_name: String},
-}

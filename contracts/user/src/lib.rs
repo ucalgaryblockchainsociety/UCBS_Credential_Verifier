@@ -8,9 +8,9 @@ pub mod state;
 pub mod multitest;
 
 // use contract::query;
-use cosmwasm_std::{entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
+use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 use error::ContractError;
-use msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use msg::{ExecuteMsg, InstantiateMsg};
 
 #[entry_point]
 pub fn instantiate(

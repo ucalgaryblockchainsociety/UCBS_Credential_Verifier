@@ -1,5 +1,5 @@
-use cosmwasm_std::{ensure, to_json_binary, DepsMut, Env, MessageInfo, Reply, Response, StdResult, WasmMsg};
-use crate::{error::ContractError, msg::{ControllerExecMsg, ExecuteMsg, InstantiateMsg, UserInfo, UserRequest}, state::{Config, CONFIG, OWNER, USER_INFO, USER_REQUEST}};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Reply, Response, StdResult};
+use crate::{error::ContractError, msg::{ExecuteMsg, InstantiateMsg}, state::{Config, CONFIG, OWNER, USER_INFO, USER_REQUEST}};
 
 const NEW_REQ_REPLY_ID: u64 = 1;
 mod exec;
@@ -57,9 +57,9 @@ pub fn reply(deps: DepsMut,env:Env,reply: Reply) -> Result<Response, ContractErr
 }
 
 pub mod query{
-    use cosmwasm_std::{Deps, StdResult, StdError, Env, MessageInfo, Binary, to_json_binary};
+    use cosmwasm_std::{Deps, StdResult, Env, Binary, to_json_binary};
 
-    use crate::{error::ContractError, msg::{UserInfoQueryResp, UserReqQueryResp}, state::{USER_INFO, USER_REQUEST}};
+    use crate::{error::ContractError, msg::{UserInfoQueryResp, UserReqQueryResp, QueryMsg}, state::{USER_INFO, USER_REQUEST}};
 
 
     pub fn get_user_requests(deps: Deps, _env: Env, req_id: String) -> StdResult<Binary> {//StdResult<UserReqQueryResp>{
@@ -82,7 +82,7 @@ pub mod query{
         // Ok(to_json_binary(&UserReqQueryResp{value}));
     }
 
-    pub fn get_user_info(deps: Deps, _env: Env) -> StdResult<Binary> {// StdResult<UserInfoQueryResp>{
+    pub fn get_user_info(deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {// StdResult<UserInfoQueryResp>{
         // let value = USER_INFO.load(deps.storage)?;
         let value = USER_INFO.may_load(deps.storage)?;
 
